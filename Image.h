@@ -28,8 +28,8 @@ struct Image
   size_t Size()  const { return size; }
   Pixel* Data()        { return  data; }
 
-  Pixel GetPixel(int x, int y) { return data[width * y + x];}
-  void  PutPixel(int x, int y, const Pixel &pix) { data[width* y + x] = pix; }
+  Pixel GetPixel(int x, int y) { return data[/*width*/height * y + x]; }
+  void  PutPixel(int x, int y, const Pixel &pix) { data[/*width*/height * y + x] = pix; }
 
   ~Image();
 
