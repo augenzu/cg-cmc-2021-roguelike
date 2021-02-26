@@ -8,56 +8,34 @@
 #include <iostream>
 
 
-Image::Image(const std::string &a_path)
+Image::Image(const std::string &path)
 {
-  if((data = (Pixel*) stbi_load(a_path.c_str(), &width, &height, &channels, /*0*/sizeof(Pixel))) != nullptr)
+  if((_data = (Pixel*) stbi_load(path.c_str(), &_width, &_height, &_channels, sizeof(Pixel))) != nullptr)
   {
-    size = width * height * channels;
+    _size = _width * _height * _channels;
   }
 }
 
-Image::Image(int a_width, int a_height, int a_channels)
+Image::Image(int width, int height, int channels)
 {
-  data = new Pixel[a_width * a_height]{};
+  _data = new Pixel[width * height]{};
 
-  if(data != nullptr)
+  if(_data != nullptr)
   {
-    width = a_width;
-    height = a_height;
-    size = a_width * a_height * a_channels;
-    channels = a_channels;
-    self_allocated = true;
+    _width = width;
+    _height = height;
+    _size = width * height * channels;
+    _channels = channels;
+    _self_allocated = true;
   }
-}
-
-
-int Image::Save(const std::string &a_path)
-{
-  auto extPos = a_path.find_last_of('.');
-  if(a_path.substr(extPos, std::string::npos) == ".png" || a_path.substr(extPos, std::string::npos) == ".PNG")
-  {
-    stbi_write_png(a_path.c_str(), width, height, channels, data, width * channels);
-  }
-  else if(a_path.substr(extPos, std::string::npos) == ".jpg" || a_path.substr(extPos, std::string::npos) == ".JPG" ||
-          a_path.substr(extPos, std::string::npos) == ".jpeg" || a_path.substr(extPos, std::string::npos) == ".JPEG")
-  {
-    stbi_write_jpg(a_path.c_str(), width, height, channels, data, 100);
-  }
-  else
-  {
-    std::cerr << "Unknown file extension: " << a_path.substr(extPos, std::string::npos) << "in file name" << a_path << "\n";
-    return 1;
-  }
-
-  return 0;
 }
 
 Image::~Image()
 {
-  if(self_allocated) {
-    delete[] data;
+  if(_self_allocated) {
+    delete[] _data;
   }
   else {
-    stbi_image_free(data);
+    stbi_image_free(_data);
   }
 }

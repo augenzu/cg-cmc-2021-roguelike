@@ -3,7 +3,7 @@
 
 bool Player::Moved() const
 {
-  if(coords.x == old_coords.x && coords.y == old_coords.y)
+  if(_coords.x == _old_coords.x && _coords.y == _old_coords.y)
     return false;
   else
     return true;
@@ -11,24 +11,24 @@ bool Player::Moved() const
 
 void Player::ProcessInput(MovementDir dir)
 {
-  int move_dist = move_speed * 1;
+  int move_dist = _move_speed * 1;
   switch(dir)
   {
     case MovementDir::UP:
-      old_coords.y = coords.y;
-      coords.y += move_dist;
+      _old_coords.y = _coords.y;
+      _coords.y += move_dist;
       break;
     case MovementDir::DOWN:
-      old_coords.y = coords.y;
-      coords.y -= move_dist;
+      _old_coords.y = _coords.y;
+      _coords.y -= move_dist;
       break;
     case MovementDir::LEFT:
-      old_coords.x = coords.x;
-      coords.x -= move_dist;
+      _old_coords.x = _coords.x;
+      _coords.x -= move_dist;
       break;
     case MovementDir::RIGHT:
-      old_coords.x = coords.x;
-      coords.x += move_dist;
+      _old_coords.x = _coords.x;
+      _coords.x += move_dist;
       break;
     default:
       break;
@@ -39,21 +39,21 @@ void Player::Draw(Image &screen)
 {
   if(Moved())
   {
-    for(int y = old_coords.y; y /*<=*/< old_coords.y + TILE_SIZE; ++y)
+    for(int y = _old_coords.y; y /*<=*/< _old_coords.y + TILE_SIZE; ++y)
     {
-      for(int x = old_coords.x; x /*<=*/< old_coords.x + TILE_SIZE; ++x)
+      for(int x = _old_coords.x; x /*<=*/< _old_coords.x + TILE_SIZE; ++x)
       {
-        screen.PutPixel(x, y, backgroundColor);
+        screen.PutPixel({ x, y }, backgroundColor);
       }
     }
-    old_coords = coords;
+    _old_coords = _coords;
   }
 
-  for(int y = coords.y; y /*<=*/< coords.y + TILE_SIZE; ++y)
+  for(int y = _coords.y; y /*<=*/< _coords.y + TILE_SIZE; ++y)
   {
-    for(int x = coords.x; x /*<=*/< coords.x + TILE_SIZE; ++x)
+    for(int x = _coords.x; x /*<=*/< _coords.x + TILE_SIZE; ++x)
     {
-      screen.PutPixel(x, y, color);
+      screen.PutPixel({ x, y }, _color);
     }
   }
 }
