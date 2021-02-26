@@ -1,3 +1,4 @@
+# executable
 bin/*
 
 CMakeFiles/*
@@ -7,5 +8,9 @@ CMakeCache.txt
 
 Makefile
 
+# all the tiles locations
 resources/tiles/*
 resources/full-tileset/*
+
+# .vscode settings
+**/.vscode/
