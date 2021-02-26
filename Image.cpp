@@ -10,7 +10,7 @@
 
 Image::Image(const std::string &a_path)
 {
-  if((data = (Pixel*)stbi_load(a_path.c_str(), &width, &height, &channels, /*0*/sizeof(Pixel))) != nullptr)
+  if((data = (Pixel*) stbi_load(a_path.c_str(), &width, &height, &channels, /*0*/sizeof(Pixel))) != nullptr)
   {
     size = width * height * channels;
   }
@@ -18,7 +18,7 @@ Image::Image(const std::string &a_path)
 
 Image::Image(int a_width, int a_height, int a_channels)
 {
-  data = new Pixel[a_width * a_height ]{};
+  data = new Pixel[a_width * a_height]{};
 
   if(data != nullptr)
   {
@@ -54,10 +54,10 @@ int Image::Save(const std::string &a_path)
 
 Image::~Image()
 {
-  if(self_allocated)
-    delete [] data;
-  else
-  {
+  if(self_allocated) {
+    delete[] data;
+  }
+  else {
     stbi_image_free(data);
   }
 }

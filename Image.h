@@ -3,7 +3,7 @@
 
 #include <string>
 
-constexpr int tileSize = 16;
+constexpr int TILE_SIZE = 24;
 
 struct Pixel
 {
@@ -13,7 +13,7 @@ struct Pixel
   uint8_t a;
 };
 
-constexpr Pixel backgroundColor{0, 0, 0, 0};
+constexpr Pixel backgroundColor{/*0*/255, 0, 0, 0};
 
 struct Image
 {
@@ -28,7 +28,7 @@ struct Image
   size_t Size()  const { return size; }
   Pixel* Data()        { return  data; }
 
-  Pixel GetPixel(int x, int y) { return data[/*height*/width * y + x]; }
+  Pixel GetPixel(int x, int y) const { return data[/*height*/width * y + x]; }
   void  PutPixel(int x, int y, const Pixel &pix) { data[/*height*/width * y + x] = pix; }
 
   ~Image();
