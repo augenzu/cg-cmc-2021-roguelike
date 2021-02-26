@@ -88,7 +88,7 @@ public:
 
   const Pixel &GetPixel(int x, int y) const
   {
-    return _data[y * tile_size + x];
+    return _data[(tile_size - y - 1) * tile_size + x];  // tile is inverted along the y axis
   }
 private:
   Pixel *_data{ nullptr };
@@ -305,8 +305,8 @@ int main(int argc, char **argv)
 	while (gl_error != GL_NO_ERROR)
 		gl_error = glGetError();
 
-	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2};
-	Player player{starting_pos};
+	Point starting_pos{ .x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 };
+	Player player{ starting_pos };
 
 	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
 
