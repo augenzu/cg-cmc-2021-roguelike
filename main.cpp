@@ -11,10 +11,11 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <string>
 #include <vector>
 
 
-constexpr int TILES_X = /*70*/10, TILES_Y = 6;
+constexpr int TILES_X = /*70*/6, TILES_Y = 10;
 
 enum class MapElement
 {
@@ -34,18 +35,63 @@ std::map<char, const MapElement> map_elements{
   { 'x', MapElement::EXIT }
 };
 
-// const std::map<MapElement, const Image> tiles{
-//   { MapElement::EMPTY, Image("resources/tiles/empty.png") },
-//   { MapElement::WALL, Image("resources/tiles/wall.png") },
-//   { MapElement::FAKE_WALL, Image("resources/fake_wall/empty.png") },
-//   { MapElement::FLOOR, Image("resources/tiles/floor.png") },
-//   { MapElement::EXIT, Image("resources/tiles/exit.png") }
-// };
-
-
-struct TileCoords
+struct Coords
 {
   int x, y;
+};
+
+
+class Tile
+{
+public:
+  static const int tile_size{ 24 };
+
+  explicit Tile(const std::string &path)
+  {   
+    Image img(path);
+
+    if (img.Data() != nullptr) {
+      _data = new Pixel[tile_size * tile_size];
+
+      for (int x = 0; x < tile_size; ++x) {
+        for (int y = 0; y < tile_size; ++y) {
+          _data[y * tile_size + x] = img.Data()[y * tile_size + x];
+        }
+      }
+    }
+  }
+
+  Tile(Tile &&rhs) : _data(rhs._data)
+  {
+    rhs._data = nullptr;
+  }
+
+  Tile(const Tile &rhs)
+    : _data(new Pixel[tile_size * tile_size])
+  {
+    for (int x = 0; x < tile_size; ++x) {
+      for (int y = 0; y < tile_size; ++y) {
+        _data[y * tile_size + x] = rhs._data[y * tile_size + x];
+      }
+    }
+  }
+
+  ~Tile()
+  {
+    if (_data != nullptr) {
+      delete[] _data;
+    }
+  }
+
+  Tile &operator=(const Tile &rhs) = delete;
+  Tile &operator=(Tile &&rhs) = delete;
+
+  const Pixel &GetPixel(int x, int y) const
+  {
+    return _data[y * tile_size + x];
+  }
+private:
+  Pixel *_data{ nullptr };
 };
 
 
@@ -55,8 +101,8 @@ public:
   LevelMap(int tiles_x = TILES_X, int tiles_y = TILES_Y)
       : _tiles_x(tiles_x), _tiles_y(tiles_y)
   {
-    for (int x = 0; x < _tiles_x; ++x) {
-        std::vector<MapElement> row{ static_cast<size_t>(_tiles_y), MapElement::EMPTY };
+    for (int y = 0; y < _tiles_y; ++y) {
+        std::vector<MapElement> row{ static_cast<size_t>(_tiles_x), MapElement::EMPTY };
         _data.push_back(row);
     }
   }
@@ -64,22 +110,23 @@ public:
 
   void Read(const std::string &path)
   {
+    std::cout << "map: " << std::endl;
     std::ifstream fin{ path };
-    for (int x = 0; x < _tiles_x; ++x) {
+    for (int y = 0; y < _tiles_y; ++y) {
       std::string row;
-      fin >> row;
-      std::cout << "row: " << row << std::endl;
-      for (int y = 0; y < _tiles_y; ++y) {
-        _data[x][y] = map_elements[row[y]];
+      std::getline(fin, row);
+      std::cout << row << std::endl;
+      for (int x = 0; x < _tiles_x; ++x) {
+        _data[y][x] = map_elements[row[x]];
       }
     }
   }
 
   int TilesX() const { return _tiles_x; }
   int TilesY() const { return _tiles_y; }
-  MapElement GetMapElement(const TileCoords &coords) const
+  MapElement GetMapElement(const Coords &coords) const
   {
-    return _data[coords.x][coords.y];
+    return _data[coords.y][coords.x];
   }
 
 private:
@@ -88,49 +135,28 @@ private:
 };
 
 
-void DrawBackgroundTile(Image &screen, const TileCoords &coords, const Image &tile)
+void DrawBackgroundTile(Image &screen, const Coords &pixel_coords, const Tile &tile)
 {
-  for (int x = 0; x < TILE_SIZE; ++x) {
-    for (int y = 0; y < TILE_SIZE; ++y) {
-      screen.PutPixel(coords.x * TILE_SIZE + x, coords.y * TILE_SIZE + y, tile.GetPixel(x, y));
+  for (int y = 0; y < TILE_SIZE; ++y) {
+    for (int x = 0; x < TILE_SIZE; ++x) {
+      screen.PutPixel(pixel_coords.x + x, pixel_coords.y + y, tile.GetPixel(x, y));
     }
   }
 }
 
 void DrawBackground(Image &screen,
     const LevelMap &level_map,
-    const std::map<MapElement, const Image> &tiles)
+    const std::map<MapElement, const Tile> &tiles)
 {
-  for (int x = 0; x < level_map.TilesX(); ++x) {
-    for (int y = 0; y < level_map.TilesY(); ++y) {
-      TileCoords coords{ x, y };
-      MapElement map_element = level_map.GetMapElement(coords);
-      const Image &tile = tiles.at(map_element);
-      DrawBackgroundTile(screen, coords, tile);
+  for (int y = 0; y < level_map.TilesY(); ++y) {
+    for (int x = 0; x < level_map.TilesX(); ++x) {
+      Coords tile_coords{ x, y };
+      Coords pixel_coords{ x * TILE_SIZE, y * TILE_SIZE };
+      MapElement map_element = level_map.GetMapElement(tile_coords);
+      const Tile &tile = tiles.at(map_element);
+      DrawBackgroundTile(screen, pixel_coords, tile);
     }
   }
-}
-
-
-int main()
-{
-  // const std::map<MapElement, const Image> tiles{
-  //   { MapElement::EMPTY, Image("resources/tiles/empty.png") },
-  //   { MapElement::WALL, Image("resources/tiles/wall.png") },
-  //   { MapElement::FAKE_WALL, Image("resources/fake_wall/empty.png") },
-  //   { MapElement::FLOOR, Image("resources/tiles/floor.png") },
-  //   { MapElement::EXIT, Image("resources/tiles/exit.png") }
-  // };
-
-  // std::cout << "EMPTY Image width: " << tiles.at(MapElement::EMPTY).Width() << std::endl;
-
-  Image i("resources/tiles/empty.png");
-  std::cout << "EMPTY Image width: " << i.Width() << std::endl;
-
-  LevelMap level_map{};
-  level_map.Read("resources/levels/level1.txt");
-  
-  return 0;
 }
 
 
@@ -246,65 +272,86 @@ int initGL()
 	return 0;
 }
 
-// int main(int argc, char **argv)
-// {
-// 	if(!glfwInit())
-//     return -1;
+int main(int argc, char **argv)
+{
+	if(!glfwInit())
+    return -1;
 
-// //	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-// //	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-// //	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-// 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-//   GLFWwindow*  window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "task1 base project", nullptr, nullptr);
-// 	if (window == nullptr)
-// 	{
-// 		std::cout << "Failed to create GLFW window" << std::endl;
-// 		glfwTerminate();
-// 		return -1;
-// 	}
+  GLFWwindow*  window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "task1 base project", nullptr, nullptr);
+	if (window == nullptr)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
 	
-// 	glfwMakeContextCurrent(window); 
+	glfwMakeContextCurrent(window); 
 
-// 	glfwSetKeyCallback        (window, OnKeyboardPressed);  
-// 	glfwSetCursorPosCallback  (window, OnMouseMove); 
-//   glfwSetMouseButtonCallback(window, OnMouseButtonClicked);
-// 	glfwSetScrollCallback     (window, OnMouseScroll);
+	glfwSetKeyCallback        (window, OnKeyboardPressed);  
+	glfwSetCursorPosCallback  (window, OnMouseMove); 
+  glfwSetMouseButtonCallback(window, OnMouseButtonClicked);
+	glfwSetScrollCallback     (window, OnMouseScroll);
 
-// 	if(initGL() != 0) 
-// 		return -1;
+	if(initGL() != 0) 
+		return -1;
 	
-//   //Reset any OpenGL errors which could be present for some reason
-// 	GLenum gl_error = glGetError();
-// 	while (gl_error != GL_NO_ERROR)
-// 		gl_error = glGetError();
+  //Reset any OpenGL errors which could be present for some reason
+	GLenum gl_error = glGetError();
+	while (gl_error != GL_NO_ERROR)
+		gl_error = glGetError();
 
-// 	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2};
-// 	Player player{starting_pos};
+	Point starting_pos{.x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2};
+	Player player{starting_pos};
 
-// 	Image img("../resources/tex.png");
-// 	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
 
-//   glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);  GL_CHECK_ERRORS;
-//   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
+  
+  //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
 
-//   //game loop
-// 	while (!glfwWindowShouldClose(window))
-// 	{
-// 		GLfloat currentFrame = glfwGetTime();
-// 		deltaTime = currentFrame - lastFrame;
-// 		lastFrame = currentFrame;
-//     glfwPollEvents();
 
-//     processPlayerMovement(player);
-//     player.Draw(screenBuffer);
+  const std::map<MapElement, const Tile> tiles{
+    { MapElement::EMPTY, Tile("resources/tiles/empty.png") },
+    { MapElement::WALL, Tile("resources/tiles/wall.png") },
+    { MapElement::FAKE_WALL, Tile("resources/tiles/fake_wall.png") },
+    { MapElement::FLOOR, Tile("resources/tiles/floor.png") },
+    { MapElement::EXIT, Tile("resources/tiles/exit.png") }
+  };
 
-// 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
-//     glDrawPixels (WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
+  LevelMap level_map{};
+  level_map.Read("resources/levels/level1.txt");
 
-// 		glfwSwapBuffers(window);
-// 	}
 
-// 	glfwTerminate();
-// 	return 0;
-// }
+  //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
+
+
+
+  glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);  GL_CHECK_ERRORS;
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
+
+  //game loop
+	while (!glfwWindowShouldClose(window))
+	{
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+    glfwPollEvents();
+
+    DrawBackground(screenBuffer, level_map, tiles);
+
+    processPlayerMovement(player);
+    player.Draw(screenBuffer);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
+    glDrawPixels (WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
+
+		glfwSwapBuffers(window);
+	}
+
+	glfwTerminate();
+	return 0;
+}
