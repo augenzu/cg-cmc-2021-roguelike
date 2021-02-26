@@ -35,11 +35,6 @@ std::map<char, const MapElement> map_elements{
   { 'x', MapElement::EXIT }
 };
 
-struct Coords
-{
-  int x, y;
-};
-
 
 class Tile
 {
@@ -126,7 +121,7 @@ public:
   int TilesY() const { return _tiles_y; }
   MapElement GetMapElement(const Coords &coords) const
   {
-    return _data[coords.y][coords.x];
+    return _data[_tiles_y - coords.y - 1][coords.x];  // level map is inverted along the y axis
   }
 
 private:
@@ -139,7 +134,7 @@ void DrawBackgroundTile(Image &screen, const Coords &pixel_coords, const Tile &t
 {
   for (int y = 0; y < TILE_SIZE; ++y) {
     for (int x = 0; x < TILE_SIZE; ++x) {
-      screen.PutPixel(pixel_coords.x + x, pixel_coords.y + y, tile.GetPixel(x, y));
+      screen.PutPixel({ pixel_coords.x + x, pixel_coords.y + y }, tile.GetPixel(x, y));
     }
   }
 }
@@ -305,7 +300,7 @@ int main(int argc, char **argv)
 	while (gl_error != GL_NO_ERROR)
 		gl_error = glGetError();
 
-	Point starting_pos{ .x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 };
+	Coords starting_pos{ .x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 };
 	Player player{ starting_pos };
 
 	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
