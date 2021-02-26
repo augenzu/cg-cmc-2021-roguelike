@@ -39,9 +39,9 @@ void Player::Draw(Image &screen)
 {
   if(Moved())
   {
-    for(int y = old_coords.y; y <= old_coords.y + tileSize; ++y)
+    for(int y = old_coords.y; y /*<=*/< old_coords.y + TILE_SIZE; ++y)
     {
-      for(int x = old_coords.x; x <= old_coords.x + tileSize; ++x)
+      for(int x = old_coords.x; x /*<=*/< old_coords.x + TILE_SIZE; ++x)
       {
         screen.PutPixel(x, y, backgroundColor);
       }
@@ -49,9 +49,9 @@ void Player::Draw(Image &screen)
     old_coords = coords;
   }
 
-  for(int y = coords.y; y <= coords.y + tileSize; ++y)
+  for(int y = coords.y; y /*<=*/< coords.y + TILE_SIZE; ++y)
   {
-    for(int x = coords.x; x <= coords.x + tileSize; ++x)
+    for(int x = coords.x; x /*<=*/< coords.x + TILE_SIZE; ++x)
     {
       screen.PutPixel(x, y, color);
     }

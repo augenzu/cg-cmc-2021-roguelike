@@ -29,7 +29,7 @@ struct Player
 private:
   Point coords {.x = 10, .y = 10};
   Point old_coords {.x = 10, .y = 10};
-  Pixel color {.r = 255, .g = 255, .b = 0, .a = 255};
+  Pixel color {.r = /*255*/0, .g = 255, .b = 0, .a = 255};
   int move_speed = 4;
 
 };
