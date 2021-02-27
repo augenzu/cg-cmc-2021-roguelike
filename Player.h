@@ -17,9 +17,11 @@ struct Player
   explicit Player(Coords coords = {.x = 10, .y = 10}) :
                  _coords(coords), _old_coords(_coords) {};
 
-  bool Moved() const;
+  bool Moved(MovementDir dir) const;
   void ProcessInput(MovementDir dir);
-  void Draw(Image &screen);
+
+  void UpdateBackground(Image &screen, const Image &background);
+  void Draw(Image &screen, const Image &background);
 
 private:
   Coords _coords {.x = 10, .y = 10};
