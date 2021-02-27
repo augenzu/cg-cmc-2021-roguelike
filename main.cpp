@@ -1,5 +1,6 @@
 #include "common.h"
 #include "Image.h"
+#include "MapElements.h"
 #include "Player.h"
 #include "Tile.h"
 
@@ -17,33 +18,6 @@
 
 
 constexpr int TILES_X = 70, TILES_Y = 30;
-
-enum class MapElement
-{
-  EMPTY,
-  WALL,
-  FAKE_WALL,
-  FLOOR,
-  PLAYER,
-  EXIT
-};
-
-std::map<char, const MapElement> map_elements{
-  { ' ', MapElement::EMPTY },
-  { '#', MapElement::WALL },
-  { '%', MapElement::FAKE_WALL },
-  { '.', MapElement::FLOOR },
-  { '@', MapElement::PLAYER },
-  { 'x', MapElement::EXIT }
-};
-
-const std::map<MapElement, const Tile> tiles{
-  { MapElement::EMPTY, Tile("resources/tiles/empty.png") },
-  { MapElement::WALL, Tile("resources/tiles/wall.png") },
-  { MapElement::FAKE_WALL, Tile("resources/tiles/fake_wall.png") },
-  { MapElement::FLOOR, Tile("resources/tiles/floor.png") },
-  { MapElement::EXIT, Tile("resources/tiles/exit.png") }
-};
 
 
 class LevelMap
@@ -69,7 +43,7 @@ public:
       std::getline(fin, row);
       std::cout << row << std::endl;
       for (int x = 0; x < _tiles_x; ++x) {
-        _data[y][x] = map_elements[row[x]];
+        _data[y][x] = map_elements.at(row[x]);
         if (_data[y][x] == MapElement::PLAYER) {
           _player_coords = { x, _tiles_y - y - 1 };
           _data[y][x] = MapElement::FLOOR;
