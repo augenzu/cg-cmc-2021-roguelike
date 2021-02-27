@@ -111,15 +111,18 @@ void DrawBackground(Image &screen,
     const LevelMap &level_map,
     const std::map<MapElement, const Tile> &tiles)
 {
+  const Tile &floor_tile = tiles.at(MapElement::FLOOR);
+  
   for (int y = 0; y < level_map.TilesY(); ++y) {
     for (int x = 0; x < level_map.TilesX(); ++x) {
-      Coords tile_coords{ x, y };
-      Coords pix_coords{ x * TILE_SIZE, y * TILE_SIZE };
+      Coords map_coords{ x, y };
+      Coords img_coords{ x * TILE_SIZE, y * TILE_SIZE };
 
-      MapElement map_element = level_map.GetMapElement(tile_coords);
+      MapElement map_element = level_map.GetMapElement(map_coords);
       const Tile &tile = tiles.at(map_element);
 
-      DrawBackgroundTile(screen, pix_coords, tile);
+      floor_tile.DrawBackground(screen, img_coords);
+      tile.DrawOverBackground(screen, img_coords, screen);
     }
   }
 }
@@ -127,8 +130,6 @@ void DrawBackground(Image &screen,
 
 //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
 
-
-// constexpr GLsizei WINDOW_WIDTH = TILES_X * TILE_SIZE, WINDOW_HEIGHT = TILES_Y * TILE_SIZE;
 
 struct InputState
 {
