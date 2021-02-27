@@ -43,6 +43,20 @@ const Pixel &Tile::GetPixel(const Coords &coords) const
   return _data[(tile_size - coords.y - 1) * tile_size + coords.x];  // tile is inverted along the y axis
 }
 
+void Tile::DrawBackground(Image &screen, const Coords &coords) const
+{
+  for (int y = 0; y < TILE_SIZE; ++y) {
+    for (int x = 0; x < TILE_SIZE; ++x) {
+      Coords tile_coords{ x, y };
+      Coords screen_coords{ coords.x + x, coords.y + y };
+
+      Pixel bg_pix = GetPixel(tile_coords);
+
+      screen.PutPixel(screen_coords, bg_pix);
+    }
+  }
+}
+
 void Tile::DrawOverBackground(Image &screen, const Coords &coords, const Image &background) const
 {
   for (int y = 0; y < tile_size; ++y) {

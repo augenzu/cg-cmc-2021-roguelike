@@ -18,7 +18,10 @@ public:
   Tile &operator=(Tile &&rhs) = delete;
 
   const Pixel &GetPixel(const Coords &coords) const;
+
+  void DrawBackground(Image &screen, const Coords &coords) const;
   void DrawOverBackground(Image &screen, const Coords &coords, const Image &background) const;
+
 private:
   Pixel *_data{ nullptr };
 };
