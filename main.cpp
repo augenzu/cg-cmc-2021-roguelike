@@ -1,6 +1,7 @@
 #include "common.h"
 #include "Image.h"
 #include "Player.h"
+#include "Tile.h"
 
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
@@ -33,60 +34,6 @@ std::map<char, const MapElement> map_elements{
   { '%', MapElement::FAKE_WALL },
   { '.', MapElement::FLOOR },
   { 'x', MapElement::EXIT }
-};
-
-
-class Tile
-{
-public:
-  static const int tile_size{ 24 };
-
-  explicit Tile(const std::string &path)
-  {   
-    Image img(path);
-
-    if (img.Data() != nullptr) {
-      _data = new Pixel[tile_size * tile_size];
-
-      for (int x = 0; x < tile_size; ++x) {
-        for (int y = 0; y < tile_size; ++y) {
-          _data[y * tile_size + x] = img.Data()[y * tile_size + x];
-        }
-      }
-    }
-  }
-
-  Tile(Tile &&rhs) : _data(rhs._data)
-  {
-    rhs._data = nullptr;
-  }
-
-  Tile(const Tile &rhs)
-    : _data(new Pixel[tile_size * tile_size])
-  {
-    for (int x = 0; x < tile_size; ++x) {
-      for (int y = 0; y < tile_size; ++y) {
-        _data[y * tile_size + x] = rhs._data[y * tile_size + x];
-      }
-    }
-  }
-
-  ~Tile()
-  {
-    if (_data != nullptr) {
-      delete[] _data;
-    }
-  }
-
-  Tile &operator=(const Tile &rhs) = delete;
-  Tile &operator=(Tile &&rhs) = delete;
-
-  const Pixel &GetPixel(int x, int y) const
-  {
-    return _data[(tile_size - y - 1) * tile_size + x];  // tile is inverted along the y axis
-  }
-private:
-  Pixel *_data{ nullptr };
 };
 
 

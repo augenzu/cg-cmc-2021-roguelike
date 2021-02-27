@@ -1,0 +1,25 @@
+#ifndef MAIN_TILE_H
+#define MAIN_TILE_H
+
+#include "Image.h"
+
+class Tile
+{
+public:
+  static const int tile_size{ 24 };
+
+  explicit Tile(const std::string &path);
+  Tile(Tile &&rhs);
+  Tile(const Tile &rhs);
+
+  ~Tile();
+
+  Tile &operator=(const Tile &rhs) = delete;
+  Tile &operator=(Tile &&rhs) = delete;
+
+  const Pixel &GetPixel(int x, int y) const;
+private:
+  Pixel *_data{ nullptr };
+};
+
+#endif //MAIN_TILE_H

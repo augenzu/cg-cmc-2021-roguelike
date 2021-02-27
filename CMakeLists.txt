@@ -11,6 +11,7 @@ set(SOURCE_FILES
         glad.c
         Image.cpp
         Player.cpp
+        Tile.cpp
         main.cpp)
 
 set(ADDITIONAL_INCLUDE_DIRS
