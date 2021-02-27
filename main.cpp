@@ -16,7 +16,7 @@
 #include <vector>
 
 
-constexpr int TILES_X = /*70*/6, TILES_Y = 10;
+constexpr int TILES_X = 70, TILES_Y = 30;
 
 enum class MapElement
 {
