@@ -33,6 +33,7 @@ std::map<char, const MapElement> map_elements{
   { '#', MapElement::WALL },
   { '%', MapElement::FAKE_WALL },
   { '.', MapElement::FLOOR },
+  { '@', MapElement::PLAYER },
   { 'x', MapElement::EXIT }
 };
 
@@ -50,18 +51,28 @@ public:
   }
   ~LevelMap() = default;
 
-  void Read(const std::string &path)
+  // reads level map & returns player coordinates
+  Coords Read(const std::string &path)
   {
     std::cout << "map: " << std::endl;
+
+    Coords player_coords;
     std::ifstream fin{ path };
+
     for (int y = 0; y < _tiles_y; ++y) {
       std::string row;
       std::getline(fin, row);
       std::cout << row << std::endl;
       for (int x = 0; x < _tiles_x; ++x) {
         _data[y][x] = map_elements[row[x]];
+        if (_data[y][x] == MapElement::PLAYER) {
+          player_coords = { x, _tiles_y - y - 1 };
+          _data[y][x] = MapElement::FLOOR;
+        }
       }
     }
+
+    return player_coords;
   }
 
   int TilesX() const { return _tiles_x; }
@@ -247,10 +258,7 @@ int main(int argc, char **argv)
 	while (gl_error != GL_NO_ERROR)
 		gl_error = glGetError();
 
-	Coords starting_pos{ .x = WINDOW_WIDTH / 2, .y = WINDOW_HEIGHT / 2 };
-	Player player{ starting_pos };
-
-	Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
+  Image screenBuffer(WINDOW_WIDTH, WINDOW_HEIGHT, 4);
 
   
   //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
@@ -265,7 +273,9 @@ int main(int argc, char **argv)
   };
 
   LevelMap level_map{};
-  level_map.Read("resources/levels/level1.txt");
+  Coords player_coords = level_map.Read("resources/levels/level1.txt");
+
+  Player player{ { player_coords.x * TILE_SIZE, player_coords.y * TILE_SIZE } };
 
 
   //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
