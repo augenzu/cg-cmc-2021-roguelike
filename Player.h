@@ -2,6 +2,7 @@
 #define MAIN_PLAYER_H
 
 #include "Image.h"
+#include "Tile.h"
 
 enum class MovementDir
 {
@@ -25,7 +26,7 @@ private:
   Coords _old_coords {.x = 10, .y = 10};
   Pixel _color {.r = 0, .g = 255, .b = 0, .a = 255};
   int _move_speed = 4;
-
+  const Tile _tile{ "resources/tiles/player.png" };
 };
 
 #endif //MAIN_PLAYER_H

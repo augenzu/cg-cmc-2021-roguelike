@@ -53,7 +53,7 @@ void Player::Draw(Image &screen)
   {
     for(int x = _coords.x; x /*<=*/< _coords.x + TILE_SIZE; ++x)
     {
-      screen.PutPixel({ x, y }, _color);
+      screen.PutPixel({ x, y }, _tile.GetPixel(x - _coords.x, y - _coords.y));
     }
   }
 }
