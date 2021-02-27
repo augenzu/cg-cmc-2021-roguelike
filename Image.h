@@ -20,8 +20,9 @@ struct Pixel
 
 constexpr Pixel backgroundColor{255, 0, 0, 0};
 
-struct Image
+class Image
 {
+public:
   explicit Image(const std::string &path);
   Image(int width, int height, int channels);
 
