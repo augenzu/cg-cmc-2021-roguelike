@@ -38,7 +38,30 @@ Tile::~Tile()
   }
 }
 
-const Pixel &Tile::GetPixel(int x, int y) const
+const Pixel &Tile::GetPixel(const Coords &coords) const
 {
-  return _data[(tile_size - y - 1) * tile_size + x];  // tile is inverted along the y axis
+  return _data[(tile_size - coords.y - 1) * tile_size + coords.x];  // tile is inverted along the y axis
+}
+
+void Tile::DrawOverBackground(Image &screen, const Coords &coords, const Image &background) const
+{
+  for (int y = 0; y < tile_size; ++y) {
+    for (int x = 0; x < tile_size; ++x) {
+      Coords tile_coords{ x, y };
+      Coords screen_coords{ coords.x + x, coords.y + y };
+      Pixel bg_pix = background.GetPixel(screen_coords);
+      Pixel pix = GetPixel(tile_coords);
+
+      double alpha = pix.a / 255.0;
+
+      Pixel blendend_pix{
+        .r = static_cast<uint8_t>(pix.r * alpha + bg_pix.r * (1 - alpha)),
+        .g = static_cast<uint8_t>(pix.g * alpha + bg_pix.g * (1 - alpha)),
+        .b = static_cast<uint8_t>(pix.b * alpha + bg_pix.b * (1 - alpha)),
+        .a = static_cast<uint8_t>(pix.a * alpha + bg_pix.a * (1 - alpha))
+      };
+
+      screen.PutPixel(screen_coords, blendend_pix);
+    }
+  }
 }
