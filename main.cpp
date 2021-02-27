@@ -1,5 +1,6 @@
 #include "common.h"
 #include "Image.h"
+#include "LevelMap.h"
 #include "MapElements.h"
 #include "Player.h"
 #include "Tile.h"
@@ -7,79 +8,6 @@
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-
-//-------------------------------------------MY-NEW-CODE------------------------------------------------------//
-
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
-
-
-constexpr int TILES_X = 70, TILES_Y = 30;
-
-
-class LevelMap
-{
-public:
-  LevelMap(int tiles_x = TILES_X, int tiles_y = TILES_Y)
-      : _tiles_x(tiles_x), _tiles_y(tiles_y)
-  {
-    for (int y = 0; y < _tiles_y; ++y) {
-        std::vector<MapElement> row{ static_cast<size_t>(_tiles_x), MapElement::EMPTY };
-        _data.push_back(row);
-    }
-  }
-  ~LevelMap() = default;
-
-  void Read(const std::string &path)
-  {
-    std::cout << "map: " << std::endl;
-    std::ifstream fin{ path };
-
-    for (int y = 0; y < _tiles_y; ++y) {
-      std::string row;
-      std::getline(fin, row);
-      std::cout << row << std::endl;
-      for (int x = 0; x < _tiles_x; ++x) {
-        _data[y][x] = map_elements.at(row[x]);
-        if (_data[y][x] == MapElement::PLAYER) {
-          _player_coords = { x, _tiles_y - y - 1 };
-          _data[y][x] = MapElement::FLOOR;
-        }
-      }
-    }
-  }
-
-  int TilesX() const { return _tiles_x; }
-  int TilesY() const { return _tiles_y; }
-
-  MapElement GetMapElement(const Coords &coords) const
-  {
-    return _data[_tiles_y - coords.y - 1][coords.x];  // level map is inverted along the y axis
-  }
-
-  Coords PlayerCoords() const { return _player_coords; }
-
-private:
-  int _tiles_x{ TILES_X };
-  int _tiles_y{ TILES_Y };
-  std::vector<std::vector<MapElement>> _data;
-  Coords _player_coords{ 0, 0 };
-};
-
-
-void DrawBackgroundTile(Image &screen, const Coords &coords, const Tile &tile)
-{
-  for (int y = 0; y < TILE_SIZE; ++y) {
-    for (int x = 0; x < TILE_SIZE; ++x) {
-      Coords tile_coords{ x, y };
-      Coords screen_coords{ coords.x + x, coords.y + y };
-      screen.PutPixel(screen_coords, tile.GetPixel(tile_coords));
-    }
-  }
-}
 
 void DrawBackground(Image &screen,
     const LevelMap &level_map,
@@ -100,9 +28,6 @@ void DrawBackground(Image &screen,
     }
   }
 }
-
-
-//-------------------------------------------MY-NEW-CODE------------------------------------------------------//
 
 
 struct InputState
@@ -245,26 +170,16 @@ int main(int argc, char **argv)
 		gl_error = glGetError();
   }
 
-  
-  //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
-
-
-  Coords player_coords{ level_map.PlayerCoords() };
-  Player player{ { player_coords.x * TILE_SIZE, player_coords.y * TILE_SIZE } };
+  glViewport(0, 0, window_width, window_height);  GL_CHECK_ERRORS;
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
   
   Image backgroundBuffer(window_width, window_height);
   DrawBackground(backgroundBuffer, level_map, tiles);
-
   Image screenBuffer(window_width, window_height);
   DrawBackground(screenBuffer, level_map, tiles);
 
-
-  //-------------------------------------------MY-NEW-CODE------------------------------------------------------//
-
-
-
-  glViewport(0, 0, window_width, window_height);  GL_CHECK_ERRORS;
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
+  Coords player_coords{ level_map.PlayerCoords() };
+  Player player{ { player_coords.x * TILE_SIZE, player_coords.y * TILE_SIZE } };
 
   GLfloat deltaTime = 0.0f;
   GLfloat lastFrame = 0.0f;
@@ -275,10 +190,7 @@ int main(int argc, char **argv)
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
     glfwPollEvents();
-
-    // DrawBackground(screenBuffer, level_map, tiles);
 
     processPlayerMovement(player);
     player.Draw(screenBuffer, backgroundBuffer);
