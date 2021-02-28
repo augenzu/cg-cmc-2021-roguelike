@@ -7,7 +7,8 @@ constexpr int TILE_SIZE = 24;
 
 struct Coords
 {
-  int x, y;
+  int x{ 0 };
+  int y{ 0 };
 };
 
 struct Pixel
@@ -24,7 +25,7 @@ class Image
 {
 public:
   explicit Image(const std::string &path);
-  Image(int width, int height, int channels);
+  Image(int width, int height, int channels = 4);
 
   Pixel* Data()
   {
