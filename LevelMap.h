@@ -10,7 +10,7 @@
 #include <vector>
 
 
-constexpr int TILES_X = 70, TILES_Y = 30;
+constexpr int TILES_X = 60, TILES_Y = 30;
 
 
 class LevelMap
