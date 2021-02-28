@@ -29,6 +29,7 @@ const std::map<MapElement, const Tile> tiles{
   { MapElement::WALL, Tile("resources/tiles/wall.png") },
   { MapElement::FAKE_WALL, Tile("resources/tiles/fake_wall.png") },
   { MapElement::FLOOR, Tile("resources/tiles/floor.png") },
+  { MapElement::PLAYER, Tile("resources/tiles/player.png") },
   { MapElement::EXIT, Tile("resources/tiles/exit.png") }
 };
 
