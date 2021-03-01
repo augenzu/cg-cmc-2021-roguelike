@@ -8,8 +8,16 @@ CMakeCache.txt
 
 Makefile
 
-# all the tiles locations
 resources/tiles/*
+
+!resources/tiles/empty.png
+!resources/tiles/strong_wall.png
+!resources/tiles/fragile_wall.png
+!resources/tiles/fake_wall.png
+!resources/tiles/floor.png
+!resources/tiles/player.png
+!resources/tiles/exit.png
+
 resources/full-tileset/*
 
 # .vscode settings
