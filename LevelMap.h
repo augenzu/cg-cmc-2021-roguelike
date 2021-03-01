@@ -18,21 +18,17 @@ constexpr int TILES_X = 60, TILES_Y = 30;
 class LevelMap
 {
 public:
-  LevelMap(int tiles_x = TILES_X, int tiles_y = TILES_Y);
+  LevelMap();
   ~LevelMap() = default;
 
+  static const int tiles_x{ TILES_X };
+  static const int tiles_y{ TILES_Y };
+
   void Read(const std::string &path);
-
-  int TilesX() const { return _tiles_x; }
-  int TilesY() const { return _tiles_y; }
-
   MapElement GetMapElement(const Coords &coords) const;
-
   Coords PlayerCoords() const { return _player_coords; }
 
 private:
-  int _tiles_x{ TILES_X };
-  int _tiles_y{ TILES_Y };
   std::vector<std::vector<MapElement>> _data;
   Coords _player_coords{ 0, 0 };
 };
