@@ -1,6 +1,7 @@
 #ifndef MAIN_TILE_H
 #define MAIN_TILE_H
 
+#include "Coords.h"
 #include "Image.h"
 
 class Tile

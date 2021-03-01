@@ -1,15 +1,13 @@
 #ifndef MAIN_IMAGE_H
 #define MAIN_IMAGE_H
 
+#include "Coords.h"
+
 #include <string>
+
 
 constexpr int TILE_SIZE = 24;
 
-struct Coords
-{
-  int x{ 0 };
-  int y{ 0 };
-};
 
 struct Pixel
 {
@@ -34,11 +32,11 @@ public:
 
   Pixel GetPixel(const Coords &coords) const
   {
-    return _data[_width * coords.y + coords.x];
+    return _data[_width * coords.Y() + coords.X()];
   }
   void PutPixel(const Coords &coords, const Pixel &pix)
   {
-    _data[_width * coords.y + coords.x] = pix;
+    _data[_width * coords.Y() + coords.X()] = pix;
   }
 
   ~Image();

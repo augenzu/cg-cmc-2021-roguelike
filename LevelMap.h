@@ -4,6 +4,8 @@
 
 #include "MapElements.h"
 
+#include "Coords.h"
+
 #include <fstream>
 #include <iostream>
 #include <string>
