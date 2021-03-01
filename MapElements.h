@@ -8,7 +8,8 @@
 enum class MapElement
 {
   EMPTY,
-  WALL,
+  STRONG_WALL,
+  FRAGILE_WALL,
   FAKE_WALL,
   FLOOR,
   PLAYER,
@@ -17,7 +18,8 @@ enum class MapElement
 
 const std::map<char, const MapElement> map_elements{
   { ' ', MapElement::EMPTY },
-  { '#', MapElement::WALL },
+  { '#', MapElement::STRONG_WALL },
+  { '?', MapElement::FRAGILE_WALL },
   { '%', MapElement::FAKE_WALL },
   { '.', MapElement::FLOOR },
   { '@', MapElement::PLAYER },
@@ -26,7 +28,8 @@ const std::map<char, const MapElement> map_elements{
 
 const std::map<MapElement, const Tile> tiles{
   { MapElement::EMPTY, Tile("resources/tiles/empty.png") },
-  { MapElement::WALL, Tile("resources/tiles/wall.png") },
+  { MapElement::STRONG_WALL, Tile("resources/tiles/strong_wall.png") },
+  { MapElement::FRAGILE_WALL, Tile("resources/tiles/fragile_wall.png") },
   { MapElement::FAKE_WALL, Tile("resources/tiles/fake_wall.png") },
   { MapElement::FLOOR, Tile("resources/tiles/floor.png") },
   { MapElement::PLAYER, Tile("resources/tiles/player.png") },
