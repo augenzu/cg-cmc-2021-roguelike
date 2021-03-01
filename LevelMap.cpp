@@ -1,29 +1,26 @@
 #include "LevelMap.h"
 
 
-LevelMap::LevelMap()
-{
-  for (int y = 0; y < tiles_y; ++y) {
-    std::vector<MapElement> row{ static_cast<size_t>(tiles_x), MapElement::EMPTY };
-    _data.push_back(row);
-  }
-}
-
-void LevelMap::Read(const std::string &path)
+LevelMap::LevelMap(const std::string &path)
 {
   std::ifstream fin{ path };
 
   for (int y = 0; y < tiles_y; ++y) {
-    std::string row;
-    std::getline(fin, row);
+    std::vector<MapElement> map_row;
+
+    std::string text_row;
+    std::getline(fin, text_row);
 
     for (int x = 0; x < tiles_x; ++x) {
-      _data[y][x] = map_elements.at(row[x]);
-      if (_data[y][x] == MapElement::PLAYER) {
-        _player_coords = { x, tiles_y - y - 1 };
-        _data[y][x] = MapElement::FLOOR;           // obviously under a player is a floor
+      MapElement map_element = map_elements.at(text_row[x]);
+      if (map_element == MapElement::PLAYER) {
+        map_element = MapElement::FLOOR;             // obviously under a player is a floor
+        _player_coords = { x, tiles_y - y - 1 };     // determine player's coords
       }
+      map_row.push_back(map_element);
     }
+
+    _data.push_back(map_row);
   }
 }
 
