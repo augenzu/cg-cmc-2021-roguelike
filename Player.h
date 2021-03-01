@@ -1,7 +1,9 @@
 #ifndef MAIN_PLAYER_H
 #define MAIN_PLAYER_H
 
+#include "Coords.h"
 #include "Image.h"
+#include "LevelMap.h"
 #include "MapElements.h"
 #include "Tile.h"
 
@@ -13,20 +15,23 @@ enum class MovementDir
   RIGHT
 };
 
-struct Player
+class Player
 {
-  explicit Player(Coords coords = {.x = 10, .y = 10}) :
-                 _coords(coords), _old_coords(_coords) {};
+public:
+  explicit Player(Coords coords)
+      : _coords(coords), _old_coords(_coords) {};
 
-  bool Moved(MovementDir dir) const;
-  void ProcessInput(MovementDir dir);
+  Coords GetCoords() const { return _coords; }
 
-  void UpdateBackground(Image &screen, const Image &background);
-  void Draw(Image &screen, const Image &background);
+  void ProcessInput(MovementDir dir, const LevelMap &level_map, MapElement &touched);
+  void Draw(Image &screen, const Image &background) const;
 
 private:
-  Coords _coords {.x = 10, .y = 10};
-  Coords _old_coords {.x = 10, .y = 10};
+  bool Moved(MovementDir dir) const;
+  void UpdateBackground(Image &screen, const Image &background) const;
+
+  Coords _coords{ 10, 10 };
+  Coords _old_coords{ 10, 10 };
   Pixel _color {.r = 0, .g = 255, .b = 0, .a = 255};
   int _move_speed = 4;
   const Tile _tile{ tiles.at(MapElement::PLAYER) };
