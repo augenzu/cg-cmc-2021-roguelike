@@ -26,5 +26,20 @@ LevelMap::LevelMap(const std::string &path)
 
 MapElement LevelMap::GetMapElement(const Coords &coords) const
 {
-  return _data[tiles_y - coords.Y() - 1][coords.X()];  // level map is inverted along the y axis
+  MapElement map_element;
+
+  if (AreValid(coords)) {
+    map_element = _data[tiles_y - coords.Y() - 1][coords.X()];  // level map is inverted along the y axis
+  } else {
+    map_element = MapElement::INVALID;
+  }
+
+  return map_element;
+}
+
+bool LevelMap::AreValid(const Coords &coords) const
+{
+  bool are_valid = (coords.X() >= 0 && coords.X() < tiles_x
+      && coords.Y() >= 0 && coords.Y() < tiles_y);
+  return are_valid;
 }

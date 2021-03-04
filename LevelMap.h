@@ -30,6 +30,8 @@ public:
 private:
   std::vector<std::vector<MapElement>> _data;
   Coords _player_coords{ 0, 0 };
+
+  bool AreValid(const Coords &coords) const;
 };
 
 
