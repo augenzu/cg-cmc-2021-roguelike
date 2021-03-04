@@ -1,22 +1,24 @@
 #include "Image.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-
-#include <iostream>
-
 
 Image::Image(const std::string &path)
-{
-  if((_data = (Pixel*) stbi_load(path.c_str(), &_width, &_height, &_channels, sizeof(Pixel))) != nullptr)
-  {
-    _size = _width * _height * _channels;
+{   
+  ImageLoader img(path);
+
+  if (img.Data() != nullptr) {
+    _width = img.Width();
+    _height = img.Height();
+    _data = new Pixel[_height * _width];
+
+    for (int y = 0; y < _height; ++y) {
+      for (int x = 0; x < _width; ++x) {
+        _data[y * _width + x] = img.Data()[y * _width + x];
+      }
+    }
   }
 }
 
-Image::Image(int width, int height, int channels)
+Image::Image(int width, int height)
 {
   _data = new Pixel[width * height]{};
 
@@ -24,18 +26,48 @@ Image::Image(int width, int height, int channels)
   {
     _width = width;
     _height = height;
-    _size = width * height * channels;
-    _channels = channels;
-    _self_allocated = true;
+  }
+}
+
+Image::Image(Image &&rhs)
+    : _width(rhs._width),
+    _height(rhs._height),
+    _data(rhs._data)
+{
+  rhs._data = nullptr;
+}
+
+Image::Image(const Image &rhs)
+    :  _width(rhs._width),
+    _height(rhs._height),
+    _data(new Pixel[rhs._height * rhs._width])
+{
+  for (int y = 0; y < _height; ++y) {
+    for (int x = 0; x < _width; ++x) {
+      _data[y * _width + x] = rhs._data[y * _width + x];
+    }
   }
 }
 
 Image::~Image()
 {
-  if(_self_allocated) {
+  if (_data != nullptr) {
     delete[] _data;
   }
-  else {
-    stbi_image_free(_data);
-  }
+}
+
+const Pixel &Image::GetPixel(const Coords &coords) const
+{
+  return _data[_width * coords.Y() + coords.X()];
+}
+
+void Image::PutPixel(const Coords &coords, const Pixel &pix)
+{
+  _data[_width * coords.Y() + coords.X()] = pix;
+}
+
+
+Pixel *Image::Data()
+{
+	return _data;
 }
