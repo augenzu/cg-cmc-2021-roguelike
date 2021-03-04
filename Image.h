@@ -24,6 +24,8 @@ public:
   const Pixel &GetPixel(const Coords &coords) const;
 	void PutPixel(const Coords &coords, const Pixel &pix);
 
+  void Draw(Image &screen) const;
+
 	Pixel *Data();
 
 private:
