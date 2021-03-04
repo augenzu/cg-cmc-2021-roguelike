@@ -10,10 +10,10 @@
 #include <GLFW/glfw3.h>
 
 
-std::vector</*const*/ std::string> level_map_text_files{
-  "resources/levels/level1.txt",
-  "resources/levels/level2.txt",
-  "resources/levels/level3.txt",
+const std::vector<std::string> level_map_text_files{
+  "resources/level_maps/level_0.txt",
+  "resources/level_maps/level_1.txt",
+  "resources/level_maps/level_2.txt",
 };
 
 
@@ -212,7 +212,6 @@ int main(int argc, char **argv)
     //game loop
     while (!to_next_level && !glfwWindowShouldClose(window))
     {
-      
       GLfloat currentFrame = glfwGetTime();
       deltaTime = currentFrame - lastFrame;
       lastFrame = currentFrame;
