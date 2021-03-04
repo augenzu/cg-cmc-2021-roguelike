@@ -23,7 +23,7 @@ public:
 
   Coords GetCoords() const { return _coords; }
 
-  void ProcessInput(MovementDir dir, const LevelMap &level_map, MapElement &touched);
+  void ProcessInput(MovementDir dir, const LevelMap &level_map, MapElement &touched_by_player);
   void Draw(Image &screen, const Image &background) const;
 
 private:
