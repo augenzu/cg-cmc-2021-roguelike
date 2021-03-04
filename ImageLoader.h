@@ -20,12 +20,14 @@ class ImageLoader
 {
 public:
   explicit ImageLoader(const std::string &path);
+  ~ImageLoader();
 
-  Pixel* Data() { return _data; }
+  operator bool() const;
+
+  Pixel GetPixel(int x, int y) const;
+
   int Width() const { return _width; }
   int Height() const { return _height; }
-
-  ~ImageLoader();
 
 private:
   int _width{ -1 };

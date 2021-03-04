@@ -23,3 +23,13 @@ ImageLoader::~ImageLoader()
     stbi_image_free(_data);
   }
 }
+
+ImageLoader::operator bool() const
+{
+  return _data != nullptr;
+}
+
+Pixel ImageLoader::GetPixel(int x, int y) const
+{
+  return _data[(_height - y - 1) * _width + x];
+}
