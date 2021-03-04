@@ -5,14 +5,14 @@ Image::Image(const std::string &path)
 {   
   ImageLoader img(path);
 
-  if (img.Data() != nullptr) {
+  if (img) {
     _width = img.Width();
     _height = img.Height();
     _data = new Pixel[_height * _width];
 
     for (int y = 0; y < _height; ++y) {
       for (int x = 0; x < _width; ++x) {
-        _data[y * _width + x] = img.Data()[y * _width + x];
+         _data[y * _width + x] = img.GetPixel(x, y);
       }
     }
   }
@@ -66,6 +66,19 @@ void Image::PutPixel(const Coords &coords, const Pixel &pix)
   _data[_width * coords.Y() + coords.X()] = pix;
 }
 
+// for now only draws if 
+// _height <= screen._height && _width <= screen._width
+void Image::Draw(Image &screen) const
+{
+  for (int y = 0; y < _height; ++y) {
+    for (int x = 0; x < _width; ++x) {
+      Coords img_coords{ x, y };
+      Pixel pix = GetPixel(img_coords);
+
+      screen.PutPixel(img_coords, pix);
+    }
+  }
+}
 
 Pixel *Image::Data()
 {

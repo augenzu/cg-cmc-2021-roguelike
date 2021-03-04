@@ -4,12 +4,12 @@ Tile::Tile(const std::string &path)
 {   
   ImageLoader img(path);
 
-  if (img.Data() != nullptr) {
+  if (img) {
     _data = new Pixel[tile_size * tile_size];
 
     for (int y = 0; y < tile_size; ++y) {
       for (int x = 0; x < tile_size; ++x) {
-        _data[y * tile_size + x] = img.Data()[y * tile_size + x];
+        _data[y * tile_size + x] = img.GetPixel(x, y);
       }
     }
   }
@@ -40,8 +40,7 @@ Tile::~Tile()
 
 const Pixel &Tile::GetPixel(const Coords &coords) const
 {
-  // tile is inverted along the y axis
-  return _data[(tile_size - coords.Y() - 1) * tile_size + coords.X()];
+  return _data[coords.Y() * tile_size + coords.X()];
 }
 
 void Tile::DrawBackground(Image &screen, const Coords &coords) const
