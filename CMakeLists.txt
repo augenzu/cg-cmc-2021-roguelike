@@ -11,6 +11,7 @@ set(SOURCE_FILES
         glad.c
         Coords.cpp
         Image.cpp
+        ImageLoader.cpp
         LevelMap.cpp
         Player.cpp
         Tile.cpp
