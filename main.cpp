@@ -1,6 +1,7 @@
 #include "common.h"
 #include "Coords.h"
 #include "Image.h"
+#include "Level.h"
 #include "LevelMap.h"
 #include "MapElements.h"
 #include "Player.h"
@@ -9,12 +10,8 @@
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-
-const std::vector<std::string> level_map_text_files{
-  "resources/level_maps/level_0.txt",
-  "resources/level_maps/level_1.txt",
-  "resources/level_maps/level_2.txt",
-};
+#include <iostream>
+#include <map>
 
 
 void DrawBackground(Image &screen,
@@ -26,7 +23,7 @@ void DrawBackground(Image &screen,
   for (int y = 0; y < LevelMap::tiles_y; ++y) {
     for (int x = 0; x < LevelMap::tiles_x; ++x) {
       Coords map_coords{ x, y };
-      Coords img_coords{ x * TILE_SIZE, y * TILE_SIZE };
+      Coords img_coords{ x * Tile::tile_size, y * Tile::tile_size };
 
       MapElement map_element = level_map.GetMapElement(map_coords);
       const Tile &tile = tiles.at(map_element);
@@ -38,10 +35,16 @@ void DrawBackground(Image &screen,
 }
 
 
-void EndTheGame()
+enum class GameResult
 {
-  std::cout << "GAME OVER" << std::endl;
-}
+  LOST,
+  WON
+};
+
+const std::map<GameResult, const Image> endings{
+  { GameResult::LOST, Image("resources/game_endings/lost.png") },
+  { GameResult::WON, Image("resources/game_endings/won.png") }
+};
 
 
 struct InputState
@@ -190,16 +193,33 @@ int main(int argc, char **argv)
   glViewport(0, 0, window_width, window_height);  GL_CHECK_ERRORS;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
 
-  GLfloat deltaTime = 0.0f;
-  GLfloat lastFrame = 0.0f;
+  // GLfloat deltaTime = 0.0f;
+  // GLfloat lastFrame = 0.0f;
   
 
-  for (const auto &text_file : level_map_text_files) {
-    LevelMap level_map{ text_file };
+  for (const auto &level : levels) {
+    LevelMap level_map{ level.MapPath() };
+
+    //--------------------show opening-------------------------------------------------//
+
+    Image screenBuffer(window_width, window_height);
+
+    const Image &opening{ level.Opening() };
+
+    for (int i = 0; i < 100; ++i) {
+      opening.Draw(screenBuffer);
+
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
+      glDrawPixels (window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
+
+      glfwSwapBuffers(window);
+    }
+
+    //--------------------show opening-------------------------------------------------//
     
     Image backgroundBuffer(window_width, window_height);
     DrawBackground(backgroundBuffer, level_map, tiles);
-    Image screenBuffer(window_width, window_height);
+    // Image screenBuffer(window_width, window_height);
     DrawBackground(screenBuffer, level_map, tiles);
 
     Coords player_tile_coords{ level_map.PlayerCoords() };
@@ -207,14 +227,13 @@ int main(int argc, char **argv)
     Player player{ player_img_coords };
     player.Draw(screenBuffer, backgroundBuffer);
 
-    bool to_next_level{false};
+    bool to_next_level{ false };
 
     //game loop
-    while (!to_next_level && !glfwWindowShouldClose(window))
-    {
+    while (!to_next_level && !glfwWindowShouldClose(window)) {
       GLfloat currentFrame = glfwGetTime();
-      deltaTime = currentFrame - lastFrame;
-      lastFrame = currentFrame;
+      // deltaTime = currentFrame - lastFrame;
+      // lastFrame = currentFrame;
       glfwPollEvents();
 
       MapElement touched_by_player{ MapElement::FLOOR };
@@ -230,7 +249,6 @@ int main(int argc, char **argv)
           const Tile &floor_tile = tiles.at(MapElement::FLOOR);
           floor_tile.DrawBackground(backgroundBuffer, player.GetCoords());
           player.Draw(screenBuffer, backgroundBuffer);
-          // [[fallthrough]];
         }
         case MapElement::FLOOR: {
           player.Draw(screenBuffer, backgroundBuffer);
@@ -259,7 +277,23 @@ int main(int argc, char **argv)
     }
   }
 
-  EndTheGame();
+  //--------------------show ending-------------------------------------------------//
+
+  Image screenBuffer(window_width, window_height);
+  
+  const Image &ending = endings.at(GameResult::LOST);
+  
+  for (int i = 0; i < 100; ++i) {
+    ending.Draw(screenBuffer);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
+    glDrawPixels (window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
+
+    glfwSwapBuffers(window);
+  }
+
+  //--------------------show ending-------------------------------------------------//
+  
 	glfwTerminate();
 
 	return 0;
