@@ -3,6 +3,7 @@
 
 #include "Coords.h"
 #include "Image.h"
+#include "ImageLoader.h"
 
 class Tile
 {
@@ -21,7 +22,9 @@ public:
   const Pixel &GetPixel(const Coords &coords) const;
 
   void DrawBackground(Image &screen, const Coords &coords) const;
-  void DrawOverBackground(Image &screen, const Coords &coords, const Image &background) const;
+  void DrawOverBackground(Image &screen,
+    const Coords &coords,
+    const Image &background) const;
 
 private:
   Pixel *_data{ nullptr };

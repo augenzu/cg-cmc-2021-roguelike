@@ -2,13 +2,13 @@
 
 Tile::Tile(const std::string &path)
 {   
-  Image img(path);
+  ImageLoader img(path);
 
   if (img.Data() != nullptr) {
     _data = new Pixel[tile_size * tile_size];
 
-    for (int x = 0; x < tile_size; ++x) {
-      for (int y = 0; y < tile_size; ++y) {
+    for (int y = 0; y < tile_size; ++y) {
+      for (int x = 0; x < tile_size; ++x) {
         _data[y * tile_size + x] = img.Data()[y * tile_size + x];
       }
     }
@@ -24,8 +24,8 @@ Tile::Tile(Tile &&rhs)
 Tile::Tile(const Tile &rhs)
     : _data(new Pixel[tile_size * tile_size])
 {
-  for (int x = 0; x < tile_size; ++x) {
-    for (int y = 0; y < tile_size; ++y) {
+  for (int y = 0; y < tile_size; ++y) {
+    for (int x = 0; x < tile_size; ++x) {
       _data[y * tile_size + x] = rhs._data[y * tile_size + x];
     }
   }
@@ -40,13 +40,14 @@ Tile::~Tile()
 
 const Pixel &Tile::GetPixel(const Coords &coords) const
 {
-  return _data[(tile_size - coords.Y() - 1) * tile_size + coords.X()];  // tile is inverted along the y axis
+  // tile is inverted along the y axis
+  return _data[(tile_size - coords.Y() - 1) * tile_size + coords.X()];
 }
 
 void Tile::DrawBackground(Image &screen, const Coords &coords) const
 {
-  for (int y = 0; y < TILE_SIZE; ++y) {
-    for (int x = 0; x < TILE_SIZE; ++x) {
+  for (int y = 0; y < tile_size; ++y) {
+    for (int x = 0; x < tile_size; ++x) {
       Coords tile_coords{ x, y };
       Coords screen_coords{ coords + tile_coords };
 
@@ -57,7 +58,9 @@ void Tile::DrawBackground(Image &screen, const Coords &coords) const
   }
 }
 
-void Tile::DrawOverBackground(Image &screen, const Coords &coords, const Image &background) const
+void Tile::DrawOverBackground(Image &screen,
+    const Coords &coords,
+    const Image &background) const
 {
   for (int y = 0; y < tile_size; ++y) {
     for (int x = 0; x < tile_size; ++x) {
