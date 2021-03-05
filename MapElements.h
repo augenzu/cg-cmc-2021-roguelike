@@ -25,13 +25,12 @@ const std::map<char, const MapElement> map_elements{
   { 'x', MapElement::EXIT }
 };
 
-const std::map<MapElement, const Tile> tiles{
-  { MapElement::EMPTY, Tile("resources/tiles/empty.png") },
-  { MapElement::WALL, Tile("resources/tiles/wall.png") },
-  { MapElement::FAKE_WALL, Tile("resources/tiles/fake_wall.png") },
-  { MapElement::FLOOR, Tile("resources/tiles/floor.png") },
-  { MapElement::PLAYER, Tile("resources/tiles/player.png") },
-  { MapElement::EXIT, Tile("resources/tiles/exit.png") }
+const std::map<MapElement, const Tile> map_tiles{
+  { MapElement::EMPTY, Tile("resources/tiles/map/empty.png") },
+  { MapElement::WALL, Tile("resources/tiles/map/wall.png") },
+  { MapElement::FAKE_WALL, Tile("resources/tiles/map/fake_wall.png") },
+  { MapElement::FLOOR, Tile("resources/tiles/map/floor.png") },
+  { MapElement::EXIT, Tile("resources/tiles/map/exit.png") }
 };
 
 #endif // MAIN_MAP_ELEMENTS_H
