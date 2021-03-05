@@ -101,7 +101,7 @@ private:
     OUT
   };
   static void Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir = FadeDirection::OUT);
-  static constexpr int fade_iterations{ 50 };
+  static constexpr int fade_iterations{ 30 };
 
   void DrawBackground();
   void ProcessPlayerMovement(InputState &input, MapElement &touched);
