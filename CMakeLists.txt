@@ -12,6 +12,7 @@ set(SOURCE_FILES
         Coords.cpp
         Image.cpp
         ImageLoader.cpp
+        Level.cpp
         LevelMap.cpp
         Player.cpp
         Tile.cpp
