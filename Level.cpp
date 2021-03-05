@@ -39,15 +39,15 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
         Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::LOST;
       } case MapElement::FAKE_WALL: {
-        const Tile &floor_tile = tiles.at(MapElement::FLOOR);
+        const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
         floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
         _player.Draw(_screen_buffer, _background_buffer);
       } case MapElement::FLOOR: {
         _player.Draw(_screen_buffer, _background_buffer);
         break;
       } case MapElement::EXIT: {
-        const Tile &floor_tile = tiles.at(MapElement::FLOOR);
-        floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
+        // const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
+        // floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
         _player.Draw(_screen_buffer, _background_buffer);
         Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::WON;
@@ -100,7 +100,7 @@ void Level::Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir)
 
 void Level::DrawBackground()
 {
-  const Tile &floor_tile = tiles.at(MapElement::FLOOR);
+  const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
   
   for (int y = 0; y < LevelMap::tiles_y; ++y) {
     for (int x = 0; x < LevelMap::tiles_x; ++x) {
@@ -108,7 +108,7 @@ void Level::DrawBackground()
       Coords img_coords{ x * Tile::tile_size, y * Tile::tile_size };
 
       MapElement map_element = _level_map.GetMapElement(map_coords);
-      const Tile &tile = tiles.at(map_element);
+      const Tile &tile = map_tiles.at(map_element);
 
       floor_tile.DrawBackground(_background_buffer, img_coords);
       tile.DrawOverBackground(_background_buffer, img_coords, _background_buffer);
