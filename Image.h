@@ -26,6 +26,9 @@ public:
 
   void Draw(Image &screen) const;
 
+  Image &operator*=(double mul);
+  Image operator*(double mul) const;
+
 	Pixel *Data();
 
 private:

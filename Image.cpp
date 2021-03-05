@@ -80,6 +80,35 @@ void Image::Draw(Image &screen) const
   }
 }
 
+Image &Image::operator*=(double mul)
+{
+  for (int y = 0; y < _height; ++y) {
+    for (int x = 0; x < _width; ++x) {
+      Coords img_coords{ x, y };
+      Pixel old_pix = GetPixel(img_coords);
+
+      Pixel multed_pix{
+        .r = static_cast<uint8_t>(old_pix.r * mul),
+        .g = static_cast<uint8_t>(old_pix.g * mul),
+        .b = static_cast<uint8_t>(old_pix.b * mul),
+        .a = old_pix.a
+      };
+
+      PutPixel(img_coords, multed_pix);
+    }
+  }
+
+  return *this;
+}
+
+Image Image::operator*(double mul) const
+{
+  Image multed_img{ *this };
+  multed_img *= mul;
+
+  return multed_img;
+}
+
 Pixel *Image::Data()
 {
 	return _data;
