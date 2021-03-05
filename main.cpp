@@ -1,6 +1,7 @@
 #include "common.h"
 #include "Coords.h"
 #include "Image.h"
+#include "InputState.h"
 #include "Level.h"
 #include "LevelMap.h"
 #include "MapElements.h"
@@ -11,56 +12,14 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <map>
 
 
-void DrawBackground(Image &screen,
-    const LevelMap &level_map,
-    const std::map<MapElement, const Tile> &tiles)
-{
-  const Tile &floor_tile = tiles.at(MapElement::FLOOR);
-  
-  for (int y = 0; y < LevelMap::tiles_y; ++y) {
-    for (int x = 0; x < LevelMap::tiles_x; ++x) {
-      Coords map_coords{ x, y };
-      Coords img_coords{ x * Tile::tile_size, y * Tile::tile_size };
-
-      MapElement map_element = level_map.GetMapElement(map_coords);
-      const Tile &tile = tiles.at(map_element);
-
-      floor_tile.DrawBackground(screen, img_coords);
-      tile.DrawOverBackground(screen, img_coords, screen);
-    }
-  }
-}
-
-
-enum class GameResult
-{
-  LOST,
-  WON
-};
-
-const std::map<GameResult, const Image> endings{
-  { GameResult::LOST, Image("resources/game_endings/lost.png") },
-  { GameResult::WON, Image("resources/game_endings/won.png") }
-};
-
-
-struct InputState
-{
-  bool keys[1024]{}; //массив состояний кнопок - нажата/не нажата
-  GLfloat lastX = 400, lastY = 300; //исходное положение мыши
-  bool firstMouse = true;
-  bool captureMouse         = true;  // Мышка захвачена нашим приложением или нет?
-  bool capturedMouseJustNow = false;
-} static Input;
+static InputState input;
 
 
 void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	switch (key)
-	{
+	switch (key) {
 	case GLFW_KEY_ESCAPE:
 		if (action == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, GL_TRUE);
@@ -73,70 +32,45 @@ void OnKeyboardPressed(GLFWwindow* window, int key, int scancode, int action, in
     break;
 	default:
 		if (action == GLFW_PRESS)
-      Input.keys[key] = true;
+      input.keys[key] = true;
 		else if (action == GLFW_RELEASE)
-      Input.keys[key] = false;
+      input.keys[key] = false;
 	}
-}
-
-void processPlayerMovement(Player &player,
-    const LevelMap &level_map,
-    MapElement &touched)
-{
-  if (Input.keys[GLFW_KEY_W]) {
-    player.ProcessInput(MovementDir::UP, level_map, touched);
-  } else if (Input.keys[GLFW_KEY_S]) {
-    player.ProcessInput(MovementDir::DOWN, level_map, touched);
-  } else if (Input.keys[GLFW_KEY_A]) {
-    player.ProcessInput(MovementDir::LEFT, level_map, touched);
-  } else if (Input.keys[GLFW_KEY_D]) {
-    player.ProcessInput(MovementDir::RIGHT, level_map, touched);
-  } else {
-    touched = MapElement::FLOOR;
-  }
 }
 
 void OnMouseButtonClicked(GLFWwindow* window, int button, int action, int mods)
 {
-  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
-    Input.captureMouse = !Input.captureMouse;
-
-  if (Input.captureMouse)
-  {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    Input.capturedMouseJustNow = true;
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+    input.captureMouse = !input.captureMouse;
   }
-  else
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+  if (input.captureMouse) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    input.capturedMouseJustNow = true;
+  } else {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+  }
 }
 
 void OnMouseMove(GLFWwindow* window, double xpos, double ypos)
 {
-  if (Input.firstMouse)
-  {
-    Input.lastX = float(xpos);
-    Input.lastY = float(ypos);
-    Input.firstMouse = false;
+  if (input.firstMouse) {
+    input.lastX = float(xpos);
+    input.lastY = float(ypos);
+    input.firstMouse = false;
   }
 
-  GLfloat xoffset = float(xpos) - Input.lastX;
-  GLfloat yoffset = Input.lastY - float(ypos);
+  GLfloat xoffset = float(xpos) - input.lastX;
+  GLfloat yoffset = input.lastY - float(ypos);
 
-  Input.lastX = float(xpos);
-  Input.lastY = float(ypos);
-}
-
-
-void OnMouseScroll(GLFWwindow* window, double xoffset, double yoffset)
-{
+  input.lastX = float(xpos);
+  input.lastY = float(ypos);
 }
 
 
 int initGL()
 {
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize OpenGL context" << std::endl;
 		return -1;
 	}
@@ -154,6 +88,7 @@ int initGL()
 	return 0;
 }
 
+
 int main(int argc, char **argv)
 {
 	if(!glfwInit()) {
@@ -162,10 +97,11 @@ int main(int argc, char **argv)
 
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  int window_width = LevelMap::tiles_x * Tile::tile_size;
-  int window_height = LevelMap::tiles_y * Tile::tile_size;
+  constexpr int window_width = Level::window_width;
+  constexpr int window_height = Level::window_height;
 
   GLFWwindow *window = glfwCreateWindow(window_width, window_height, "task1 base project", nullptr, nullptr);
+
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -178,7 +114,6 @@ int main(int argc, char **argv)
 	glfwSetKeyCallback        (window, OnKeyboardPressed);  
 	glfwSetCursorPosCallback  (window, OnMouseMove); 
   glfwSetMouseButtonCallback(window, OnMouseButtonClicked);
-	glfwSetScrollCallback     (window, OnMouseScroll);
 
 	if(initGL() != 0) {
 		return -1;
@@ -193,108 +128,22 @@ int main(int argc, char **argv)
   glViewport(0, 0, window_width, window_height);  GL_CHECK_ERRORS;
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); GL_CHECK_ERRORS;
 
-  // GLfloat deltaTime = 0.0f;
-  // GLfloat lastFrame = 0.0f;
   
+  LevelResult game_result{ LevelResult::WON };
+  
+  // game loop
+  for (const auto &level_config : level_configs) {
+    Level level(level_config);
 
-  for (const auto &level : levels) {
-    LevelMap level_map{ level.MapPath() };
+    level.ShowOpening(window);
+    game_result = level.Run(window, input);
 
-    //--------------------show opening-------------------------------------------------//
-
-    Image screenBuffer(window_width, window_height);
-
-    const Image &opening{ level.Opening() };
-
-    for (int i = 0; i < 100; ++i) {
-      opening.Draw(screenBuffer);
-
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
-      glDrawPixels (window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
-
-      glfwSwapBuffers(window);
-    }
-
-    //--------------------show opening-------------------------------------------------//
-    
-    Image backgroundBuffer(window_width, window_height);
-    DrawBackground(backgroundBuffer, level_map, tiles);
-    // Image screenBuffer(window_width, window_height);
-    DrawBackground(screenBuffer, level_map, tiles);
-
-    Coords player_tile_coords{ level_map.PlayerCoords() };
-    Coords player_img_coords{ player_tile_coords * Tile::tile_size };
-    Player player{ player_img_coords };
-    player.Draw(screenBuffer, backgroundBuffer);
-
-    bool to_next_level{ false };
-
-    //game loop
-    while (!to_next_level && !glfwWindowShouldClose(window)) {
-      GLfloat currentFrame = glfwGetTime();
-      // deltaTime = currentFrame - lastFrame;
-      // lastFrame = currentFrame;
-      glfwPollEvents();
-
-      MapElement touched_by_player{ MapElement::FLOOR };
-      processPlayerMovement(player, level_map, touched_by_player);
-
-      switch (touched_by_player) {
-        case MapElement::EMPTY: {
-          player.Draw(screenBuffer, backgroundBuffer);
-          glfwSetWindowShouldClose(window, GL_TRUE);
-          break;
-        }
-        case MapElement::FAKE_WALL: {
-          const Tile &floor_tile = tiles.at(MapElement::FLOOR);
-          floor_tile.DrawBackground(backgroundBuffer, player.GetCoords());
-          player.Draw(screenBuffer, backgroundBuffer);
-        }
-        case MapElement::FLOOR: {
-          player.Draw(screenBuffer, backgroundBuffer);
-          break;
-        }
-        case MapElement::EXIT: {
-          const Tile &floor_tile = tiles.at(MapElement::FLOOR);
-          floor_tile.DrawBackground(backgroundBuffer, player.GetCoords());
-          player.Draw(screenBuffer, backgroundBuffer);
-          to_next_level = true;
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
-      glDrawPixels (window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
-
-      glfwSwapBuffers(window);
-    }
-
-    if (glfwWindowShouldClose(window)) {
+    if (game_result != LevelResult::WON) {
       break;
     }
   }
 
-  //--------------------show ending-------------------------------------------------//
-
-  Image screenBuffer(window_width, window_height);
-  
-  const Image &ending = endings.at(GameResult::LOST);
-  
-  for (int i = 0; i < 100; ++i) {
-    ending.Draw(screenBuffer);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERRORS;
-    glDrawPixels (window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screenBuffer.Data()); GL_CHECK_ERRORS;
-
-    glfwSwapBuffers(window);
-  }
-
-  //--------------------show ending-------------------------------------------------//
-  
-	glfwTerminate();
+  Level::ShowEnding(window, game_result);
 
 	return 0;
 }
