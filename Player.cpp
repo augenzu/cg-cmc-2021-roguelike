@@ -7,6 +7,7 @@ void Player::ProcessInput(MovementDir dir,
 {
   int move_dist = _move_speed * 1;
   
+  _dir = dir;
   _old_coords = _coords;
 
   Coords delta;
@@ -98,23 +99,9 @@ void Player::ProcessInput(MovementDir dir,
 void Player::Draw(Image &screen, const Image &background) const
 { 
   UpdateBackground(screen, background);
-  _tile.DrawOverBackground(screen, _coords, background);
-}
 
-
-bool Player::Moved(MovementDir dir) const
-{
-  if(dir == MovementDir::UP && _old_coords.Y() < _coords.Y()) {
-    return true;
-  } else if (dir == MovementDir::DOWN && _old_coords.Y() > _coords.Y()) {
-    return true;
-  } else if (dir == MovementDir::RIGHT && _old_coords.X() < _coords.X()) {
-    return true;
-  } else if (dir == MovementDir::LEFT && _old_coords.X() > _coords.X()) {
-    return true;
-  } else {
-    return false;
-  }
+  const Tile &frame{ _frame_storage.GetFrame(_dir) };
+  frame.DrawOverBackground(screen, _coords, background);
 }
 
 void Player::UpdateBackground(Image &screen, const Image &background) const
