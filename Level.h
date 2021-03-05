@@ -95,6 +95,14 @@ public:
   static void ShowEnding(GLFWwindow *window, LevelResult result);
 
 private:
+  enum class FadeDirection
+  {
+    IN,
+    OUT
+  };
+  static void Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir = FadeDirection::OUT);
+  static constexpr int fade_iterations{ 50 };
+
   void DrawBackground();
   void ProcessPlayerMovement(InputState &input, MapElement &touched);
 

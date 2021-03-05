@@ -15,17 +15,16 @@ Level::Level(const LevelConfig &level_config)
 
 void Level::ShowOpening(GLFWwindow *window)
 {
-  for (int i = 0; i < 50; ++i) {
-    _opening.Draw(_screen_buffer);
-
-    glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer.Data()); GL_CHECK_ERRORS;
-    glfwSwapBuffers(window);
-  }	
+  _opening.Draw(_screen_buffer);
+  Fade(window, _screen_buffer, FadeDirection::IN);
+  Fade(window, _screen_buffer, FadeDirection::OUT);
 }
 
 LevelResult Level::Run(GLFWwindow *window, InputState &input)
 {
   _background_buffer.Draw(_screen_buffer);
+  Fade(window, _screen_buffer, FadeDirection::IN);
+
   _player.Draw(_screen_buffer, _background_buffer);
   
   while (!glfwWindowShouldClose(window)) {
@@ -37,6 +36,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
     switch (touched_by_player) {
       case MapElement::EMPTY: {
         _player.Draw(_screen_buffer, _background_buffer);
+        Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::LOST;
       } case MapElement::FAKE_WALL: {
         const Tile &floor_tile = tiles.at(MapElement::FLOOR);
@@ -49,6 +49,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
         const Tile &floor_tile = tiles.at(MapElement::FLOOR);
         floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
         _player.Draw(_screen_buffer, _background_buffer);
+        Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::WON;
       } default: {
         break;
@@ -69,14 +70,30 @@ void Level::ShowEnding(GLFWwindow *window, LevelResult result)
       [[fallthrough]];
     case LevelResult::WON: {
       Image ending = _endings.at(result);
-      for (int i = 0; i < 50; ++i) {
-        glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, ending.Data()); GL_CHECK_ERRORS;
-        glfwSwapBuffers(window);
-      }
+      Fade(window, ending, FadeDirection::IN);
+      Fade(window, ending, FadeDirection::OUT);
     }
       [[fallthrough]];
     case LevelResult::EXIT:
       glfwTerminate();
+  }
+}
+
+void Level::Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir)
+{
+  for (int i = 0; i < fade_iterations; ++i) {
+    double dimming_factor;
+
+    if (dir == FadeDirection::OUT) {
+      dimming_factor = static_cast<double>(fade_iterations - i - 1) / fade_iterations;
+    } else if (dir == FadeDirection::IN) {
+      dimming_factor = static_cast<double>(i) / fade_iterations;
+    }
+
+    Image dimmed_scrren_buffer{ orig_img * dimming_factor };
+
+    glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, dimmed_scrren_buffer.Data()); GL_CHECK_ERRORS;
+    glfwSwapBuffers(window);
   }
 }
 
