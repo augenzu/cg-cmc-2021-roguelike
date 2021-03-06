@@ -100,7 +100,7 @@ int main(int argc, char **argv)
   constexpr int window_width = Level::window_width;
   constexpr int window_height = Level::window_height;
 
-  GLFWwindow *window = glfwCreateWindow(window_width, window_height, "task1 base project", nullptr, nullptr);
+  GLFWwindow *window = glfwCreateWindow(window_width, window_height, "roguelike", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
