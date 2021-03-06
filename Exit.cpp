@@ -12,7 +12,7 @@ void Exit::Draw(Image &screen, const Image &background) const
 	tile.DrawOverBackground(screen, _coords, background);
 }
 
-Coords Exit::GetCoords() const
+bool Exit::IsOpen() const
 {
-	return _coords;
+	return _state == State::OPEN;
 }

@@ -17,8 +17,8 @@ public:
 
 	void Open();
 	void Draw(Image &screen, const Image &background) const;
-
-	Coords GetCoords() const;
+	
+	bool IsOpen() const;
 
 private:
 	Coords _coords; 
