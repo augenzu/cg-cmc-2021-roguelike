@@ -56,8 +56,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
       }
     }
 
-    glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer.Data()); GL_CHECK_ERRORS;
-    glfwSwapBuffers(window);
+    DisplayScreenBuffer(window, _screen_buffer);
   }
 
   return LevelResult::EXIT;
@@ -79,6 +78,12 @@ void Level::ShowEnding(GLFWwindow *window, LevelResult result)
   }
 }
 
+void Level::DisplayScreenBuffer(GLFWwindow *window, const Image &screen_buffer)
+{
+  glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, screen_buffer.Data()); GL_CHECK_ERRORS;
+  glfwSwapBuffers(window);
+}
+
 void Level::Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir)
 {
   for (int i = 0; i < fade_iterations; ++i) {
@@ -92,8 +97,7 @@ void Level::Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir)
 
     Image dimmed_scrren_buffer{ orig_img * dimming_factor };
 
-    glDrawPixels(window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, dimmed_scrren_buffer.Data()); GL_CHECK_ERRORS;
-    glfwSwapBuffers(window);
+    DisplayScreenBuffer(window, dimmed_scrren_buffer);
   }
 }
 
@@ -139,7 +143,7 @@ void Level::OpenTheExit()
 
   _exit.Open();
   _exit.Draw(_background_buffer, _background_buffer);
-  
+
   _background_buffer.Draw(_screen_buffer);
 }
 

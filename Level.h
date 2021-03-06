@@ -62,6 +62,7 @@ private:
     IN,
     OUT
   };
+  static void DisplayScreenBuffer(GLFWwindow *window, const Image &screen_buffer);
   static void Fade(GLFWwindow *window, const Image &orig_img, FadeDirection dir = FadeDirection::OUT);
   static constexpr int fade_iterations{ 30 };
 
