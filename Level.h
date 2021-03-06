@@ -35,7 +35,7 @@ const std::vector<LevelConfig> level_configs{
 
 enum class LevelResult
 {
-  LOST,
+  DIED,
   WON,
   EXIT
 };

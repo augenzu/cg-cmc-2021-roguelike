@@ -39,7 +39,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
         _reach_the_exit = false;
         _player.Draw(_screen_buffer, _background_buffer);
         Fade(window, _screen_buffer, FadeDirection::OUT);
-        return LevelResult::LOST;
+        return LevelResult::DIED;
       } case MapElement::FAKE_WALL: {
         _reach_the_exit = false;
         const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
@@ -74,7 +74,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
 void Level::ShowEnding(GLFWwindow *window, LevelResult result)
 {
   switch (result) {
-    case LevelResult::LOST:
+    case LevelResult::DIED:
       [[fallthrough]];
     case LevelResult::WON: {
       Image ending = _endings.at(result);
@@ -169,6 +169,6 @@ void Level::OpenTheExit()
 
 
 const std::map<LevelResult, const Image> Level::_endings{
-	{ LevelResult::LOST, Image("resources/game_endings/lost.png") },
+	{ LevelResult::DIED, Image("resources/game_endings/died.png") },
 	{ LevelResult::WON, Image("resources/game_endings/won.png") }
 };
