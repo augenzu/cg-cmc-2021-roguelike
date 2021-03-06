@@ -109,7 +109,7 @@ Image Image::operator*(double mul) const
   return multed_img;
 }
 
-Pixel *Image::Data()
+Pixel *Image::Data() const
 {
 	return _data;
 }

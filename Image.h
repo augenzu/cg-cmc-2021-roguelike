@@ -29,7 +29,7 @@ public:
   Image &operator*=(double mul);
   Image operator*(double mul) const;
 
-	Pixel *Data();
+	Pixel *Data() const;
 
 private:
   int _width{ 0 };
