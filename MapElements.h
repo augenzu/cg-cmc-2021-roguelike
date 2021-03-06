@@ -30,7 +30,7 @@ const std::map<MapElement, const Tile> map_tiles{
   { MapElement::WALL, Tile("resources/tiles/map/wall.png") },
   { MapElement::FAKE_WALL, Tile("resources/tiles/map/fake_wall.png") },
   { MapElement::FLOOR, Tile("resources/tiles/map/floor.png") },
-  { MapElement::EXIT, Tile("resources/tiles/map/exit.png") }
+  { MapElement::EXIT, Tile("resources/tiles/map/floor.png") }
 };
 
 #endif // MAIN_MAP_ELEMENTS_H
