@@ -26,10 +26,12 @@ public:
 
   MapElement GetMapElement(const Coords &coords) const;
   Coords PlayerCoords() const { return _player_coords; }
+  Coords ExitCoords() const { return _exit_coords; }
 
 private:
   std::vector<std::vector<MapElement>> _data;
-  Coords _player_coords{ 0, 0 };
+  Coords _player_coords;
+  Coords _exit_coords;
 
   bool AreValid(const Coords &coords) const;
 };

@@ -16,6 +16,8 @@ LevelMap::LevelMap(const std::string &path)
       if (map_element == MapElement::PLAYER) {
         map_element = MapElement::FLOOR;             // obviously under a player is a floor
         _player_coords = { x, tiles_y - y - 1 };     // determine player's coords
+      } else if (map_element == MapElement::EXIT) {
+        _exit_coords = { x, tiles_y - y - 1 };
       }
       map_row.push_back(map_element);
     }
