@@ -7,7 +7,8 @@ Level::Level(const LevelConfig &level_config)
     _background_buffer(window_width, window_height),
     _opening(level_config.opening_path),
     _level_map(level_config.map_path),
-		_player(_level_map.PlayerCoords() * Tile::tile_size)
+		_player(_level_map.PlayerCoords() * Tile::tile_size),
+    _exit(_level_map.ExitCoords() * Tile::tile_size)
 {
   DrawBackground();
 }
@@ -46,8 +47,7 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
         _player.Draw(_screen_buffer, _background_buffer);
         break;
       } case MapElement::EXIT: {
-        // const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
-        // floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
+        OpenTheExit();
         _player.Draw(_screen_buffer, _background_buffer);
         Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::WON;
@@ -114,6 +114,7 @@ void Level::DrawBackground()
       tile.DrawOverBackground(_background_buffer, img_coords, _background_buffer);
     }
   }
+  _exit.Draw(_background_buffer, _background_buffer);
 }
 
 void Level::ProcessPlayerMovement(InputState &input, MapElement &touched)
@@ -129,6 +130,17 @@ void Level::ProcessPlayerMovement(InputState &input, MapElement &touched)
   } else {
     touched = MapElement::FLOOR;
   }
+}
+
+void Level::OpenTheExit()
+{
+  const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
+  floor_tile.DrawBackground(_background_buffer, _exit.GetCoords());
+
+  _exit.Open();
+  _exit.Draw(_background_buffer, _background_buffer);
+  
+  _background_buffer.Draw(_screen_buffer);
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "Coords.h"
+#include "Exit.h"
 #include "Image.h"
 #include "InputState.h"
 #include "LevelMap.h"
@@ -66,13 +67,16 @@ private:
 
   void DrawBackground();
   void ProcessPlayerMovement(InputState &input, MapElement &touched);
+  void OpenTheExit();
 
   Image _screen_buffer{ window_width, window_height };
   Image _background_buffer{ window_width, window_height };
   Image _opening;
   static const std::map<LevelResult, const Image> _endings;
+
   LevelMap _level_map;
   Player _player;
+  Exit _exit;
 };
 
 
