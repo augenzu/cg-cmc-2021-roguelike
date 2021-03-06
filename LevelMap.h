@@ -1,10 +1,9 @@
 #ifndef MAIN_LEVEL_MAP_H
 #define MAIN_LEVEL_MAP_H
 
-
-#include "MapElements.h"
-
 #include "Coords.h"
+#include "MapElements.h"
+#include "Tile.h"
 
 #include <fstream>
 #include <iostream>
