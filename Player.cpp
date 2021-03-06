@@ -91,7 +91,8 @@ void Player::ProcessInput(MovementDir dir,
   }
 
   if (touched_by_player == MapElement::INVALID
-      || touched_by_player == MapElement::WALL) {
+      || touched_by_player == MapElement::WALL
+      || touched_by_player == MapElement::EXIT) {
     _coords = _old_coords;
   }
 }
