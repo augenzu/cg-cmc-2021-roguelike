@@ -7,8 +7,8 @@ Level::Level(const LevelConfig &level_config)
     _background_buffer(window_width, window_height),
     _opening(level_config.opening_path),
     _level_map(level_config.map_path),
-		_player(_level_map.PlayerCoords() * Tile::tile_size),
-    _exit(_level_map.ExitCoords() * Tile::tile_size)
+		_player(_level_map.PlayerCoords()),
+    _exit(_level_map.ExitCoords())
 {
   DrawBackground();
 }
@@ -32,25 +32,34 @@ LevelResult Level::Run(GLFWwindow *window, InputState &input)
     glfwPollEvents();
 
     MapElement touched_by_player{ MapElement::FLOOR };
-    ProcessPlayerMovement(input, touched_by_player);
+    ProcessKeyPressing(input, touched_by_player);
 
     switch (touched_by_player) {
       case MapElement::EMPTY: {
+        _reach_the_exit = false;
         _player.Draw(_screen_buffer, _background_buffer);
         Fade(window, _screen_buffer, FadeDirection::OUT);
         return LevelResult::LOST;
       } case MapElement::FAKE_WALL: {
+        _reach_the_exit = false;
         const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
         floor_tile.DrawBackground(_background_buffer, _player.GetCoords());
         _player.Draw(_screen_buffer, _background_buffer);
       } case MapElement::FLOOR: {
+        _reach_the_exit = false;
         _player.Draw(_screen_buffer, _background_buffer);
         break;
       } case MapElement::EXIT: {
-        OpenTheExit();
+        if (_reach_the_exit) {
+          if (_exit.IsOpen()) {
+            _player.Draw(_screen_buffer, _background_buffer);
+            Fade(window, _screen_buffer, FadeDirection::OUT);
+            return LevelResult::WON;
+          }
+        } else {
+          _reach_the_exit = true;
+        }
         _player.Draw(_screen_buffer, _background_buffer);
-        Fade(window, _screen_buffer, FadeDirection::OUT);
-        return LevelResult::WON;
       } default: {
         break;
       }
@@ -121,7 +130,7 @@ void Level::DrawBackground()
   _exit.Draw(_background_buffer, _background_buffer);
 }
 
-void Level::ProcessPlayerMovement(InputState &input, MapElement &touched)
+void Level::ProcessKeyPressing(InputState &input, MapElement &touched)
 {
   if (input.keys[GLFW_KEY_W]) {
     _player.ProcessInput(MovementDir::UP, _level_map, touched);
@@ -131,15 +140,26 @@ void Level::ProcessPlayerMovement(InputState &input, MapElement &touched)
     _player.ProcessInput(MovementDir::LEFT, _level_map, touched);
   } else if (input.keys[GLFW_KEY_D]) {
     _player.ProcessInput(MovementDir::RIGHT, _level_map, touched);
+  } else if (input.keys[GLFW_KEY_E]) {
+    if (_reach_the_exit) {
+      OpenTheExit();
+      touched = MapElement::EXIT;
+    } else {
+      touched = MapElement::FLOOR;
+    }
   } else {
-    touched = MapElement::FLOOR;
+    if (_reach_the_exit) {
+      touched = MapElement::EXIT;
+    } else {
+      touched = MapElement::FLOOR;
+    }
   }
 }
 
 void Level::OpenTheExit()
-{
+{ 
   const Tile &floor_tile = map_tiles.at(MapElement::FLOOR);
-  floor_tile.DrawBackground(_background_buffer, _exit.GetCoords());
+  floor_tile.DrawBackground(_background_buffer, _level_map.ExitCoords());
 
   _exit.Open();
   _exit.Draw(_background_buffer, _background_buffer);

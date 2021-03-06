@@ -67,7 +67,7 @@ private:
   static constexpr int fade_iterations{ 30 };
 
   void DrawBackground();
-  void ProcessPlayerMovement(InputState &input, MapElement &touched);
+  void ProcessKeyPressing(InputState &input, MapElement &touched);
   void OpenTheExit();
 
   Image _screen_buffer{ window_width, window_height };
@@ -78,6 +78,7 @@ private:
   LevelMap _level_map;
   Player _player;
   Exit _exit;
+  bool _reach_the_exit{ false };
 };
 
 
