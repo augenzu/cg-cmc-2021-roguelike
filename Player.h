@@ -1,11 +1,16 @@
 #ifndef MAIN_PLAYER_H
 #define MAIN_PLAYER_H
 
+
 #include "Coords.h"
 #include "Image.h"
 #include "LevelMap.h"
 #include "MapElements.h"
 #include "Tile.h"
+
+#include <map>
+#include <vector>
+
 
 enum class MovementDir
 {
@@ -16,10 +21,8 @@ enum class MovementDir
   NO_MOV
 };
 
-//-------------------------------------AnimationFrameStorage---------------------------------------------------//
 
-#include <map>
-#include <vector>
+//-------------------------------------AnimationFrameStorage---------------------------------------------------//
 
 
 class AnimationFrameStorage
@@ -32,18 +35,10 @@ public:
   AnimationFrameStorage &operator=(AnimationFrameStorage &&) = delete;
   ~AnimationFrameStorage() = default;
 
-  const Tile &GetFrame(MovementDir dir) const
-  {
-    int frame_number{ _counter.at(dir) / _animation_period };
-    const Tile &frame{ _frames.at(dir)[frame_number] };
-    ++_counter[dir];
-    _counter[dir] %= (_frames_numbers.at(dir) * _animation_period);
-
-    return frame;
-  }
+  const Tile &GetFrame(MovementDir dir) const;
 
 private:
-  static constexpr int _animation_period{ 12 };
+  static constexpr int _animation_period{ 10 };
 
   const std::map<MovementDir, std::vector<Tile>> _frames{
     { MovementDir::UP, {
@@ -93,7 +88,7 @@ class Player
 {
 public:
   explicit Player(Coords coords)
-      : _coords(coords), _old_coords(_coords) {};
+      : _coords(coords), _old_coords(_coords) {}
 
   Coords GetCoords() const { return _coords; }
 
@@ -103,14 +98,13 @@ public:
 private:
   void UpdateBackground(Image &screen, const Image &background) const;
 
-  Coords _coords{ 10, 10 };
-  Coords _old_coords{ 10, 10 };
+  Coords _coords;
+  Coords _old_coords;
   MovementDir _dir{ MovementDir::DOWN };
-
-  Pixel _color {.r = 0, .g = 255, .b = 0, .a = 255};
   int _move_speed = 4;
 
   const AnimationFrameStorage _frame_storage;
 };
+
 
 #endif //MAIN_PLAYER_H

@@ -115,3 +115,14 @@ void Player::UpdateBackground(Image &screen, const Image &background) const
     }
   }
 }
+
+
+const Tile &AnimationFrameStorage::GetFrame(MovementDir dir) const
+{
+  int frame_number{ _counter.at(dir) / _animation_period };
+  const Tile &frame{ _frames.at(dir)[frame_number] };
+  ++_counter[dir];
+  _counter[dir] %= (_frames_numbers.at(dir) * _animation_period);
+
+  return frame;
+}
